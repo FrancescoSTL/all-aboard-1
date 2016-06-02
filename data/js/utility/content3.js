@@ -6,6 +6,13 @@
     var templateNames = ['template1','template2','template3'];
     var hoverEmit = ['hoverTemplate1','hoverTemplate2','hoverTemplate3'];
 
+    addon.port.on('tokens', function(tokens) {
+        for (var i = 0, l = tokens.length; i < l; i++) {
+            // set the token container to active and shows the token
+            document.querySelector('#' + tokens[i]).classList.add('active');
+        }
+    });
+
     // add listeners to all of our buttons for hovering and clicking
     for(var x=0; x<templateNames.length; x++)
     {

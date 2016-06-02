@@ -660,7 +660,6 @@ function init() {
         && typeof simpleStorage.isOnBoarding === 'undefined') {
         modifyFirstrun();
     }
-    testSidebar(3,'utility');
 }
 
 init();
