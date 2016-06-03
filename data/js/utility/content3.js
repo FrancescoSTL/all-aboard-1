@@ -22,7 +22,6 @@
         // rescope our port emit text locally to access in the eventlistener
         (function(name) {
             node.addEventListener('click', function() {
-
                 // notify addon that we've clicked the button
                 addon.port.emit('intent', name);
             });
@@ -55,7 +54,7 @@
     }
 
     // add click listener on default theme text option
-    defaultText.addEventListener('click', function() {        
+    defaultText.addEventListener('click', function() {
         // notify addon that we've clicked the button
         addon.port.emit('intent', 'defaultTemplate');
     });
