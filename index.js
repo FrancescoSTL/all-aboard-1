@@ -483,7 +483,6 @@ function showImportDataSidebar() {
 
 /*
  * Purpose: Open the search bar
- *
  */
 function openSearch() {
     let activeWindow = utils.getMostRecentBrowserWindow();
