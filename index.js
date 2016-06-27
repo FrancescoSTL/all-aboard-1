@@ -432,7 +432,7 @@ function showSidebar(sidebarProps) {
                         break;
                     // if the redeem sticker sidebar is shown anywhere other than within content, this will need to move with it
                     case 'stickerRedeemed':
-                        destroy();
+                        startDestroyTimer();
                         break;
                     default:
                         break;
@@ -768,6 +768,18 @@ function overrideDefaults() {
     } catch(e) {
         console.error('Either no config.json file was created, or it was placed at the wrong location. Error:', e);
     }
+}
+
+/**
+ * Starts the timer based upon the afterInteractionCloseTime to destroy the addon
+ */
+function startDestroyTimer() {
+    timers.setTimeout(function() {
+        // clear the autoCloseTimer if it is running
+        autoCloseTimer(true);
+        // destroys the addon
+        destroy();
+    }, afterInteractionCloseTime);
 }
 
 /** This is called to explicitly 'uninstall' the addon, destroying functional
