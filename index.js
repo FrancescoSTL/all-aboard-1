@@ -430,6 +430,10 @@ function showSidebar(sidebarProps) {
                     case 'highlightURL':
                         highLight('urlbar');
                         break;
+                    // if the redeem sticker sidebar is shown anywhere other than within content, this will need to move with it
+                    case 'stickerRedeemed':
+                        destroy();
+                        break;
                     default:
                         break;
                 }
