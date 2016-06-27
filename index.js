@@ -58,6 +58,9 @@ var timers = require('sdk/timers');
 var utils = require('lib/utils.js');
 var windowUtils = require('sdk/window/utils');
 
+var syncPref = "services.sync.account";
+var sync = require("sdk/preferences/service").get(syncPref);
+
 var { Cu } = require('chrome');
 var { XMLHttpRequest } = require('sdk/net/xhr');
 var UITour = Cu.import('resource:///modules/UITour.jsm').UITour;
@@ -74,6 +77,7 @@ var aboutHome;
 var afterInteractionCloseTime = 120000;
 var allAboard;
 var content;
+var aboutNewtab;
 // the default interval between sidebars. Here set as hours.
 var defaultSidebarInterval = 24;
 // the time to wait before automatically closing the sidebar
@@ -743,6 +747,38 @@ function modifyFirstrun() {
 }
 
 /**
+ * Modifies the about:newtab page to show a user's imported data
+ */
+function modifyNewtab() {
+    aboutNewtab = pageMod.PageMod({
+        include: /about:newtab/,
+        contentScriptFile: './js/about-newtab.js',
+        contentScriptWhen: 'ready',
+        contentStyleFile: './css/about-newtab.css',
+        onAttach: function(worker) {
+            // constructs uri to snippet content
+            var headContentURL = './tmpl/about-newtab-header.html';
+            var footContentURL = './tmpl/about-newtab-footer.html';
+            // load snippet HTML
+            var headerContent = self.data.load(headContentURL).replace("%url", self.data.url("media/moving-truck.png"));
+            // don't load the footer if the user has a sync account
+            if(typeof sync !== 'undefined') {
+                footerContent = "";
+            }
+            // do load the footer if the user doesn't have a sync account
+            else {
+                var footerContent = self.data.load(footContentURL);
+            }
+            // emit modify event and passes snippet HTML as a string
+            worker.port.emit('modify', headerContent, footerContent);
+
+            // flag that we've shown the user their data
+            utils.store('seenUserData', true);
+        }
+    });
+}
+
+/**
  * Overrides time interval defauls from config file.
  */
 function overrideDefaults() {
@@ -820,5 +856,10 @@ exports.main = function(options) {
     if (typeof simpleStorage.onboardingDismissed === 'undefined'
         && typeof simpleStorage.isOnBoarding === 'undefined') {
         modifyFirstrun();
+    }
+
+    // do not call modifynewtab if we've already modified it once
+    if(typeof simpleStorage.seenUserData === 'undefined') {
+        modifyNewtab();
     }
 };
