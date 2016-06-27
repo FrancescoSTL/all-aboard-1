@@ -74,6 +74,7 @@ var aboutHome;
 var afterInteractionCloseTime = 120000;
 var allAboard;
 var content;
+var firstRun;
 // the default interval between sidebars. Here set as hours.
 var defaultSidebarInterval = 24;
 // the time to wait before automatically closing the sidebar
@@ -681,7 +682,7 @@ function modifyAboutHome(track, step) {
 */
 function modifyFirstrun() {
 
-    var firstRun = pageMod.PageMod({
+    firstRun = pageMod.PageMod({
         include: firstrunRegex,
         contentScriptFile: './js/firstrun.js',
         contentScriptWhen: 'ready',
@@ -702,8 +703,8 @@ function modifyFirstrun() {
 
             // listens for a message from pageMod when a user clicks on "No thanks"
             worker.port.on('onboardingDismissed', function(dismissed) {
-                // user has opted out of onboarding, destroy pageMod
-                firstRun.destroy();
+                // user has opted out of onboarding, destroy the addon
+                destroy();
                 utils.store('onboardingDismissed', dismissed);
             });
 
@@ -763,6 +764,27 @@ function overrideDefaults() {
     } catch(e) {
         console.error('Either no config.json file was created, or it was placed at the wrong location. Error:', e);
     }
+}
+
+/** This is called to explicitly 'uninstall' the addon, destroying functional
+ *  pieces needed for user interaction, effectively removing the addon
+ */
+function destroy() {
+    // removes the currently running timer, if one exists
+    timers.clearInterval(timer);
+
+    // removes the button from the UI, and disables its further use
+    if(allAboard)
+        allAboard.destroy();
+    // stops pagemod from making more modifications on abouthome in the future, and disables its further use
+    if(aboutHome)
+        aboutHome.destroy();
+    // stops pagemod from making more modifications on firstrun in the future, and disables its further use
+    if(firstRun)
+        firstRun.destroy();
+    // destroys the addon sidebar, and disables its further use
+    if(content)
+        content.dispose();
 }
 
 /** This is called when the add-on is unloaded. If the reason is either disable,
