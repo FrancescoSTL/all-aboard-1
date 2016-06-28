@@ -403,11 +403,6 @@ function showSidebar(sidebarProps) {
             // listens to an intent message and calls the relevant function
             // based on intent.
             worker.port.on('intent', function(intent) {
-                // anytime the user interacts with a sidebar, remove the previous 3 week destroy timer
-                timers.clearInterval(destroyTimer);
-                // start a new 3 week destroy timer
-                startDestroyTimer(1814400000);
-
                 switch(intent) {
                     case 'search':
                         showSearch();
@@ -447,6 +442,11 @@ function showSidebar(sidebarProps) {
 
             // listen for events when a user completes a sidebar cta
             worker.port.on('cta_complete', function() {
+                // anytime the user interacts with a sidebar, remove the previous 3 week destroy timer
+                timers.clearInterval(destroyTimer);
+                // start a new 3 week destroy timer
+                startDestroyTimer(1814400000);
+                
                 // assign new token and notify sidebar as long as we haven't done so already
                 if(!assignedToken) {
                     assignTokens(sidebarProps.step, worker);
