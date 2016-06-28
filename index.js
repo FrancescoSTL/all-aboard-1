@@ -85,8 +85,9 @@ var hostnameMatch = /^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#
 var isVisible = false;
 var sidebarProps;
 var timeElapsedFormula = 1000*60*60;
-// initialize timer to -1 to indicate that there is no timer currently running.
+// initialize timers to -1 to indicate that there are no timers currently running.
 var timer = -1;
+var destroyTimer = -1;
 // 24 hours in milliseconds
 var waitInterval = 86400000;
 
@@ -402,6 +403,11 @@ function showSidebar(sidebarProps) {
             // listens to an intent message and calls the relevant function
             // based on intent.
             worker.port.on('intent', function(intent) {
+                // anytime the user interacts with a sidebar, remove the previous 3 week destroy timer
+                timers.clearInterval(destroyTimer);
+                // start a new 3 week destroy timer
+                startDestroyTimer(1814400000);
+
                 switch(intent) {
                     case 'search':
                         showSearch();
@@ -432,7 +438,7 @@ function showSidebar(sidebarProps) {
                         break;
                     // if the redeem sticker sidebar is shown anywhere other than within content, this will need to move with it
                     case 'stickerRedeemed':
-                        startDestroyTimer();
+                        startDestroyTimer(afterInteractionCloseTime);
                         break;
                     default:
                         break;
@@ -520,6 +526,11 @@ function getSidebarProps() {
 * Shows the next sidebar for the current track i.e. values or utility
 */
 function toggleSidebar() {
+    // anytime the user opens a sidebar, remove the previous 3 week destroy timer
+    timers.clearInterval(destroyTimer);
+    // start a new 3 week destroy timer
+    startDestroyTimer(1814400000);
+
     // clears the badge
     allAboard.state('window', {
         badge: null
@@ -773,13 +784,13 @@ function overrideDefaults() {
 /**
  * Starts the timer based upon the afterInteractionCloseTime to destroy the addon
  */
-function startDestroyTimer() {
-    timers.setTimeout(function() {
+function startDestroyTimer(destroyTime) {
+    destroyTimer = timers.setTimeout(function() {
         // clear the autoCloseTimer if it is running
         autoCloseTimer(true);
         // destroys the addon
         destroy();
-    }, afterInteractionCloseTime);
+    }, destroyTime);
 }
 
 /** This is called to explicitly 'uninstall' the addon, destroying functional
