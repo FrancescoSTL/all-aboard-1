@@ -1,13 +1,13 @@
-.autoImport {
+.auto-import {
     text-align: center;
     margin-bottom: 0;
     color: #484848;
 }
 
 .autoImport header {
-	margin-top: 15px;
+    margin-top: 15px;
 }
 
-.importBody {
-	font-size: 15px;
+.import-body {
+    font-size: 15px;
 }

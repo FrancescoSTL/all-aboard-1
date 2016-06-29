@@ -2,6 +2,7 @@
 
 var headDiv = document.querySelector('#newtab-search-container');
 var footDiv = document.querySelector('#newtab-margin-bottom');
+var undoMigrate = document.querySelector('#undo-migrate');
 
 function showUserData(headerContent, footerContent) {
     headDiv.insertAdjacentHTML('beforebegin', headerContent);
@@ -12,4 +13,8 @@ function showUserData(headerContent, footerContent) {
 // start execution of the code.
 self.port.on('modify', function(headerContent, footerContent) {
     showUserData(headerContent, footerContent);
+});
+
+undoMigrate.addEventListener('click', function() {
+    addon.port.emit('undoMigrate');
 });

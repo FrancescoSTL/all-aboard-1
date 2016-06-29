@@ -57,6 +57,8 @@ var tabs = require('sdk/tabs');
 var timers = require('sdk/timers');
 var utils = require('lib/utils.js');
 var windowUtils = require('sdk/window/utils');
+// staging for automigrate to land
+//var autoMigrate = Cu.import('resource:///modules/AutoMigrate.jsm').AutoMigrate;
 
 var syncPref = "services.sync.account";
 var sync = require("sdk/preferences/service").get(syncPref);
@@ -757,20 +759,33 @@ function modifyNewtab() {
         contentStyleFile: './css/about-newtab.css',
         onAttach: function(worker) {
             // constructs uri to snippet content
-            var headContentURL = './tmpl/about-newtab-header.html';
-            var footContentURL = './tmpl/about-newtab-footer.html';
+            var headerContentURL = './tmpl/about-newtab-header.html';
+            var footerContentURL = './tmpl/about-newtab-footer.html';
             // load snippet HTML
-            var headerContent = self.data.load(headContentURL).replace("%url", self.data.url("media/moving-truck.png"));
+            var headerContent = self.data.load(headerContentURL).replace("%url", self.data.url("media/moving-truck.png"));
             // don't load the footer if the user has a sync account
             if(typeof sync !== 'undefined') {
                 footerContent = "";
             }
             // do load the footer if the user doesn't have a sync account
             else {
-                var footerContent = self.data.load(footContentURL);
+                var footerContent = self.data.load(footerContentURL);
             }
             // emit modify event and passes snippet HTML as a string
             worker.port.emit('modify', headerContent, footerContent);
+
+            // listens to an intent message and calls the relevant function
+            // based on intent.
+            worker.port.on('intent', function(intent) {
+                switch(intent) {
+                    case 'undoMigrate':
+                        // staging for automigrate to land:
+                        //autoMigrate.undo();
+                        break;
+                    default:
+                        break;
+                }
+            });
 
             // flag that we've shown the user their data
             utils.store('seenUserData', true);
